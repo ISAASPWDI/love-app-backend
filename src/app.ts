@@ -36,8 +36,7 @@ const corsOptions = {
 // Aplicar CORS a todas las rutas
 app.use(cors(corsOptions));
 
-// Manejar solicitudes preflight para todas las rutas
-app.options('*', cors(corsOptions));
+
 
 // Middleware para logging de solicitudes (útil para debug)
 app.use((req: Request, res: Response, next: NextFunction) => {
