@@ -1,67 +1,53 @@
 // src/models/compliments.model.ts
-import pool from '../config/db.config';
 import { Compliment } from '../types';
-import { ResultSetHeader, RowDataPacket } from 'mysql2';
 
 class ComplimentsModel {
+  private compliments: Compliment[] = [];
+  private currentId = 1;
+
   async create(compliment: Compliment): Promise<number> {
-    const [result] = await pool.execute<ResultSetHeader>(
-      'INSERT INTO compliments (content, is_favorite) VALUES (?, ?)',
-      [compliment.content, compliment.is_favorite || false]
-    );
-    return result.insertId;
+    const newCompliment: Compliment = {
+      id: this.currentId++,
+      content: compliment.content,
+      is_favorite: compliment.is_favorite || false,
+      created_at: new Date()
+    };
+    this.compliments.push(newCompliment);
+    return newCompliment.id!;
   }
 
   async findAll(): Promise<Compliment[]> {
-    const [rows] = await pool.query<RowDataPacket[]>(
-      'SELECT * FROM compliments ORDER BY created_at DESC'
-    );
-    return rows as Compliment[];
+    return [...this.compliments].sort((a, b) => new Date(b.created_at!).getTime() - new Date(a.created_at!).getTime());
   }
 
   async findById(id: number): Promise<Compliment | null> {
-    const [rows] = await pool.execute<RowDataPacket[]>(
-      'SELECT * FROM compliments WHERE id = ?',
-      [id]
-    );
-    if (rows.length === 0) return null;
-    return rows[0] as Compliment;
+    const compliment = this.compliments.find(c => c.id === id);
+    return compliment || null;
   }
 
   async update(id: number, compliment: Compliment): Promise<boolean> {
-    const [result] = await pool.execute<ResultSetHeader>(
-      'UPDATE compliments SET content = ?, is_favorite = ? WHERE id = ?',
-      [compliment.content, compliment.is_favorite || false, id]
-    );
-    return result.affectedRows > 0;
+    const index = this.compliments.findIndex(c => c.id === id);
+    if (index === -1) return false;
+    this.compliments[index] = {
+      ...this.compliments[index],
+      content: compliment.content,
+      is_favorite: compliment.is_favorite || false
+    };
+    return true;
   }
 
   async toggleFavorite(id: number): Promise<boolean> {
-    // First get current favorite status
-    const [rows] = await pool.execute<RowDataPacket[]>(
-      'SELECT is_favorite FROM compliments WHERE id = ?',
-      [id]
-    );
-    
-    if (rows.length === 0) return false;
-    
-    const currentStatus = rows[0].is_favorite;
-    const newStatus = !currentStatus;
-    
-    const [result] = await pool.execute<ResultSetHeader>(
-      'UPDATE compliments SET is_favorite = ? WHERE id = ?',
-      [newStatus, id]
-    );
-    
-    return result.affectedRows > 0;
+    const compliment = this.compliments.find(c => c.id === id);
+    if (!compliment) return false;
+    compliment.is_favorite = !compliment.is_favorite;
+    return true;
   }
 
   async delete(id: number): Promise<boolean> {
-    const [result] = await pool.execute<ResultSetHeader>(
-      'DELETE FROM compliments WHERE id = ?',
-      [id]
-    );
-    return result.affectedRows > 0;
+    const index = this.compliments.findIndex(c => c.id === id);
+    if (index === -1) return false;
+    this.compliments.splice(index, 1);
+    return true;
   }
 }
 

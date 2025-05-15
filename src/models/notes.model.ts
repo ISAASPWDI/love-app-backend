@@ -1,47 +1,45 @@
 // src/models/notes.model.ts
-import pool from '../config/db.config';
 import { Note } from '../types';
-import { ResultSetHeader, RowDataPacket } from 'mysql2';
 
 class NotesModel {
+  private notes: Note[] = [];
+  private currentId = 1;
+
   async create(note: Note): Promise<number> {
-    const [result] = await pool.execute<ResultSetHeader>(
-      'INSERT INTO notes (content) VALUES (?)',
-      [note.content]
-    );
-    return result.insertId;
+    const newNote: Note = {
+      id: this.currentId++,
+      content: note.content,
+      created_at: new Date() // Se asegura tipo Date correcto
+    };
+    this.notes.push(newNote);
+    return newNote.id!;
   }
 
   async findAll(): Promise<Note[]> {
-    const [rows] = await pool.query<RowDataPacket[]>(
-      'SELECT * FROM notes ORDER BY created_at DESC'
-    );
-    return rows as Note[];
+    return [...this.notes].sort((a, b) => (b.created_at!.getTime() - a.created_at!.getTime()));
   }
 
   async findById(id: number): Promise<Note | null> {
-    const [rows] = await pool.execute<RowDataPacket[]>(
-      'SELECT * FROM notes WHERE id = ?',
-      [id]
-    );
-    if (rows.length === 0) return null;
-    return rows[0] as Note;
+    const note = this.notes.find(n => n.id === id);
+    return note || null;
   }
 
   async update(id: number, note: Note): Promise<boolean> {
-    const [result] = await pool.execute<ResultSetHeader>(
-      'UPDATE notes SET content = ? WHERE id = ?',
-      [note.content, id]
-    );
-    return result.affectedRows > 0;
+    const index = this.notes.findIndex(n => n.id === id);
+    if (index === -1) return false;
+    this.notes[index] = {
+      ...this.notes[index],
+      content: note.content
+      // mantenemos created_at igual
+    };
+    return true;
   }
 
   async delete(id: number): Promise<boolean> {
-    const [result] = await pool.execute<ResultSetHeader>(
-      'DELETE FROM notes WHERE id = ?',
-      [id]
-    );
-    return result.affectedRows > 0;
+    const index = this.notes.findIndex(n => n.id === id);
+    if (index === -1) return false;
+    this.notes.splice(index, 1);
+    return true;
   }
 }
 

@@ -1,47 +1,47 @@
 // src/models/memories.model.ts
-import pool from '../config/db.config';
 import { Memory } from '../types';
-import { ResultSetHeader, RowDataPacket } from 'mysql2';
 
 class MemoriesModel {
+  private memories: Memory[] = [];
+  private currentId = 1;
+
   async create(memory: Memory): Promise<number> {
-    const [result] = await pool.execute<ResultSetHeader>(
-      'INSERT INTO memories (image_url, caption) VALUES (?, ?)',
-      [memory.image_url, memory.caption || null]
-    );
-    return result.insertId;
+    const newMemory: Memory = {
+      id: this.currentId++,
+      image_url: memory.image_url,
+      caption: memory.caption,
+      created_at: new Date() // Correctamente como Date
+    };
+    this.memories.push(newMemory);
+    return newMemory.id!;
   }
 
   async findAll(): Promise<Memory[]> {
-    const [rows] = await pool.query<RowDataPacket[]>(
-      'SELECT * FROM memories ORDER BY created_at DESC'
-    );
-    return rows as Memory[];
+    return [...this.memories].sort((a, b) => b.created_at!.getTime() - a.created_at!.getTime());
   }
 
   async findById(id: number): Promise<Memory | null> {
-    const [rows] = await pool.execute<RowDataPacket[]>(
-      'SELECT * FROM memories WHERE id = ?',
-      [id]
-    );
-    if (rows.length === 0) return null;
-    return rows[0] as Memory;
+    const memory = this.memories.find(m => m.id === id);
+    return memory || null;
   }
 
   async update(id: number, memory: Memory): Promise<boolean> {
-    const [result] = await pool.execute<ResultSetHeader>(
-      'UPDATE memories SET image_url = ?, caption = ? WHERE id = ?',
-      [memory.image_url, memory.caption || null, id]
-    );
-    return result.affectedRows > 0;
+    const index = this.memories.findIndex(m => m.id === id);
+    if (index === -1) return false;
+    this.memories[index] = {
+      ...this.memories[index],
+      image_url: memory.image_url,
+      caption: memory.caption
+      // mantenemos created_at igual
+    };
+    return true;
   }
 
   async delete(id: number): Promise<boolean> {
-    const [result] = await pool.execute<ResultSetHeader>(
-      'DELETE FROM memories WHERE id = ?',
-      [id]
-    );
-    return result.affectedRows > 0;
+    const index = this.memories.findIndex(m => m.id === id);
+    if (index === -1) return false;
+    this.memories.splice(index, 1);
+    return true;
   }
 }
 
