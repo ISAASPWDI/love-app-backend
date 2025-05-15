@@ -5,7 +5,7 @@
   "scripts": {
   "dev": "tsnd --respawn --clear src/server.ts",
   "build": "npx rimraf ./dist && tsc",
-  "start": "npm run build && node dist/app.js"
+  "start": "npm run build && node dist/server.js"
 },
   "keywords": [],
   "author": "",
