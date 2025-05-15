@@ -5,6 +5,22 @@ class QuizModel {
   private quizQuestions: QuizQuestion[] = [];
   private currentId = 1;
 
+  constructor() {
+    // Pregunta por defecto
+    const defaultQuestions: Omit<QuizQuestion, 'id' | 'created_at'>[] = [
+      { question: 'Aún no sabemos mucho de nosotros, pero ya habrá preguntas xd', answer: 'xddd' }
+    ];
+
+    defaultQuestions.forEach(q => {
+      this.quizQuestions.push({
+        id: this.currentId++,
+        question: q.question,
+        answer: q.answer,
+        created_at: new Date()
+      });
+    });
+  }
+
   async create(question: QuizQuestion): Promise<number> {
     const newQuestion: QuizQuestion = {
       id: this.currentId++,
@@ -32,7 +48,6 @@ class QuizModel {
       ...this.quizQuestions[index],
       question: question.question,
       answer: question.answer
-      // created_at no cambia
     };
     return true;
   }

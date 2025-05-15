@@ -5,6 +5,36 @@ class TimelineModel {
   private events: TimelineEvent[] = [];
   private currentId = 1;
 
+  constructor() {
+    const defaultEvents: Omit<TimelineEvent, 'id' | 'created_at'>[] = [
+      {
+        title: 'Primera y única salida xd',
+        description: 'Me acuerdo que te invité un helado :v , pero la fecha exacta no sé xd',
+        event_date: '2019-01-10'
+      },
+      {
+        title: 'Mientras pasaba el tiempo',
+        description: 'Luego pudimos salir más veces, pero tenía miedo xd',
+        event_date: '2019-01-27'
+      },
+      {
+        title: 'No estoy seguro de las fechas xd',
+        description: 'xddd',
+        event_date: '2019-02-17'
+      }
+    ];
+
+    defaultEvents.forEach(e => {
+      this.events.push({
+        id: this.currentId++,
+        title: e.title,
+        description: e.description,
+        event_date: e.event_date,
+        created_at: new Date()
+      });
+    });
+  }
+
   async create(event: TimelineEvent): Promise<number> {
     const newEvent: TimelineEvent = {
       id: this.currentId++,
@@ -34,7 +64,6 @@ class TimelineModel {
       title: event.title,
       description: event.description,
       event_date: event.event_date
-      // created_at no cambia
     };
     return true;
   }

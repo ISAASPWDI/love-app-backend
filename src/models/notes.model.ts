@@ -5,11 +5,30 @@ class NotesModel {
   private notes: Note[] = [];
   private currentId = 1;
 
+  constructor() {
+    // Notas por defecto
+    const defaultNotes: Omit<Note, 'id' | 'created_at'>[] = [
+      { content: 'hola, esta es una nota' },
+      { content: 'Hecho por stivens, netlify para frontend y render para el backend xd' },
+      { content: 'Básicamente, puedes hacer lo que quieras en esta app' },
+      { content: 'Intentaré que no se quede suspendida esta app, por eso estaré agregando cumplidos diario con fe no se borra' },
+      { content: 'Este es un proyecto donde le puse muchas ganas...' }
+    ];
+
+    defaultNotes.forEach(n => {
+      this.notes.push({
+        id: this.currentId++,
+        content: n.content,
+        created_at: new Date()
+      });
+    });
+  }
+
   async create(note: Note): Promise<number> {
     const newNote: Note = {
       id: this.currentId++,
       content: note.content,
-      created_at: new Date() // Se asegura tipo Date correcto
+      created_at: new Date()
     };
     this.notes.push(newNote);
     return newNote.id!;
@@ -30,7 +49,6 @@ class NotesModel {
     this.notes[index] = {
       ...this.notes[index],
       content: note.content
-      // mantenemos created_at igual
     };
     return true;
   }

@@ -5,6 +5,25 @@ class ComplimentsModel {
   private compliments: Compliment[] = [];
   private currentId = 1;
 
+  constructor() {
+    // Cargar cumplidos por defecto
+    const defaultCompliments: Omit<Compliment, 'id' | 'created_at'>[] = [
+      { content: 'Aunque nos vimos pocas veces antes, te recuerdo perfectamente xd', is_favorite: false },
+      { content: 'Habra más sorpresas cuando nos veamos xd', is_favorite: false },
+      { content: 'Me gustan tus ojos', is_favorite: false },
+      { content: 'Espero que te guste esta página, lo hice para ti', is_favorite: false }
+    ];
+
+    defaultCompliments.forEach(c => {
+      this.compliments.push({
+        id: this.currentId++,
+        content: c.content,
+        is_favorite: c.is_favorite,
+        created_at: new Date()
+      });
+    });
+  }
+
   async create(compliment: Compliment): Promise<number> {
     const newCompliment: Compliment = {
       id: this.currentId++,
