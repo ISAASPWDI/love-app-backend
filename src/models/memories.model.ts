@@ -13,6 +13,10 @@ class MemoriesModel {
         caption: 'Milaneso'
       },
       {
+        image_url: 'http://imgfz.com/i/OSV4Pwf.jpeg',
+        caption: 'Tommy'
+      },
+      {
         image_url: 'http://imgfz.com/i/DHYzIdy.jpeg',
         caption: 'Tus gatitos xd'
       },

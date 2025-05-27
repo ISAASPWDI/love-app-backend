@@ -25,7 +25,7 @@ class TimelineModel {
       {
         title: 'Viste por primera vez esta app :)',
         description: 'Te gustó mucho y me gusto que eso te gustara xd',
-        event_date: '2025-05-26'
+        event_date: '2025-05-27'
       }
     ];
 
