@@ -8,7 +8,7 @@ class NotesModel {
   constructor() {
     // Notas por defecto
     const defaultNotes: Omit<Note, 'id' | 'created_at'>[] = [
-      { content: 'hola, esta es una nota' },
+      { content: 'Me gustaria hablar más contigo, pero esta bien de vez en cuando también' },
       { content: 'Hecho por stivens, netlify para frontend y render para el backend xd' },
       { content: 'Básicamente, puedes hacer lo que quieras en esta app' },
       { content: 'Intentaré que no se quede suspendida esta app, por eso estaré agregando cumplidos diario con fe no se borra' },

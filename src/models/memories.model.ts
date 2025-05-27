@@ -9,6 +9,14 @@ class MemoriesModel {
     // Memorias por defecto
     const defaultMemories: Omit<Memory, 'id' | 'created_at'>[] = [
       {
+        image_url: 'http://imgfz.com/i/BQyEdDT.jpeg',
+        caption: 'Milaneso'
+      },
+      {
+        image_url: 'http://imgfz.com/i/DHYzIdy.jpeg',
+        caption: 'Tus gatitos xd'
+      },
+      {
         image_url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAR7NZ0njV5LKv06rsxPb9euz5qrOVfzeEYg&s',
         caption: 'Puedes agregar cualquier imagen jaja'
       },

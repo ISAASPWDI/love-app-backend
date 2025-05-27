@@ -11,7 +11,9 @@ class ComplimentsModel {
       { content: 'Aunque nos vimos pocas veces antes, te recuerdo perfectamente xd', is_favorite: false },
       { content: 'Habra más sorpresas cuando nos veamos xd', is_favorite: false },
       { content: 'Me gustan tus ojos', is_favorite: false },
-      { content: 'Espero que te guste esta página, lo hice para ti', is_favorite: false }
+      { content: 'Espero que te guste esta página, lo hice para ti', is_favorite: false },
+      { content: 'No dejo de pensar en ti jajaja', is_favorite: false },
+      { content: 'Haré más cosas por ti', is_favorite: false }
     ];
 
     defaultCompliments.forEach(c => {
