@@ -8,7 +8,9 @@ class QuizModel {
   constructor() {
     // Pregunta por defecto
     const defaultQuestions: Omit<QuizQuestion, 'id' | 'created_at'>[] = [
-      { question: 'Aún no sabemos mucho de nosotros, pero ya habrá preguntas xd', answer: 'xddd' }
+      { question: 'Aún no sabemos mucho de nosotros, pero ya habrá preguntas xd', answer: 'xddd' },
+      { question: 'Con cuántos años te confundí, cuando hablamos por primera vez ? xd', answer: '18' },
+      { question: '', answer: 'xddd' }
     ];
 
     defaultQuestions.forEach(q => {
