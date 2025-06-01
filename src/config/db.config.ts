@@ -12,36 +12,59 @@ console.log('DB_PORT:', process.env.DB_PORT);
 console.log('NODE_ENV:', process.env.NODE_ENV);
 console.log('DB_PASSWORD exists:', !!process.env.DB_PASSWORD);
 
-const dbConfig = {
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  port: parseInt(process.env.DB_PORT || '5432'),
-  
-  // SSL siempre activo para Supabase
-  ssl: {
-    rejectUnauthorized: false
-  },
-  
-  // Configuraciones optimizadas para conexiones externas
-  max: 10, // máximo número de conexiones en el pool
-  idleTimeoutMillis: 30000, // tiempo antes de cerrar conexiones inactivas
-  connectionTimeoutMillis: 10000, // aumentado para conexiones lentas
-  acquireTimeoutMillis: 60000, // tiempo máximo para obtener una conexión
-  
-  // Configuraciones adicionales para estabilidad
-  statement_timeout: 30000,
-  query_timeout: 30000,
-  
-  // Configuraciones específicas para evitar problemas de red
-  keepAlive: true,
-  keepAliveInitialDelayMillis: 10000,
-};
+// Usar connection string si está disponible, sino usar parámetros individuales
+const useConnectionString = !!process.env.DATABASE_URL;
+
+console.log('🔗 Using connection method:', useConnectionString ? 'CONNECTION_STRING' : 'INDIVIDUAL_PARAMS');
+
+let dbConfig: any;
+
+if (useConnectionString) {
+  console.log('📡 Using DATABASE_URL connection string');
+  dbConfig = {
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+      rejectUnauthorized: false
+    },
+    max: 10,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 10000,
+    acquireTimeoutMillis: 60000,
+    statement_timeout: 30000,
+    query_timeout: 30000,
+    keepAlive: true,
+    keepAliveInitialDelayMillis: 10000,
+  };
+} else {
+  console.log('📊 Using individual database parameters');
+  dbConfig = {
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: parseInt(process.env.DB_PORT || '5432'),
+    
+    // SSL siempre activo para Supabase
+    ssl: {
+      rejectUnauthorized: false
+    },
+    
+    // Configuraciones optimizadas para conexiones externas
+    max: 10,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 10000,
+    acquireTimeoutMillis: 60000,
+    statement_timeout: 30000,
+    query_timeout: 30000,
+    keepAlive: true,
+    keepAliveInitialDelayMillis: 10000,
+  };
+}
 
 console.log('📊 Final DB Config:', {
   ...dbConfig,
-  password: dbConfig.password ? '[HIDDEN]' : 'NOT_SET'
+  password: dbConfig.password ? '[HIDDEN]' : 'NOT_SET',
+  connectionString: dbConfig.connectionString ? '[HIDDEN]' : 'NOT_SET'
 });
 
 const pool = new Pool(dbConfig);
