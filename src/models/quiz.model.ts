@@ -1,47 +1,46 @@
 // src/models/quiz.model.ts
 import pool from '../config/db.config';
 import { QuizQuestion, QuizResult } from '../types';
-import { ResultSetHeader, RowDataPacket } from 'mysql2';
 
 class QuizModel {
   async create(question: QuizQuestion): Promise<number> {
-    const [result] = await pool.execute<ResultSetHeader>(
-      'INSERT INTO quiz (question, answer) VALUES (?, ?)',
+    const result = await pool.query(
+      'INSERT INTO quiz (question, answer) VALUES ($1, $2) RETURNING id',
       [question.question, question.answer]
     );
-    return result.insertId;
+    return result.rows[0].id;
   }
 
   async findAll(): Promise<QuizQuestion[]> {
-    const [rows] = await pool.query<RowDataPacket[]>(
+    const result = await pool.query(
       'SELECT * FROM quiz ORDER BY created_at DESC'
     );
-    return rows as QuizQuestion[];
+    return result.rows;
   }
 
   async findById(id: number): Promise<QuizQuestion | null> {
-    const [rows] = await pool.execute<RowDataPacket[]>(
-      'SELECT * FROM quiz WHERE id = ?',
+    const result = await pool.query(
+      'SELECT * FROM quiz WHERE id = $1',
       [id]
     );
-    if (rows.length === 0) return null;
-    return rows[0] as QuizQuestion;
+    if (result.rows.length === 0) return null;
+    return result.rows[0];
   }
 
   async update(id: number, question: QuizQuestion): Promise<boolean> {
-    const [result] = await pool.execute<ResultSetHeader>(
-      'UPDATE quiz SET question = ?, answer = ? WHERE id = ?',
+    const result = await pool.query(
+      'UPDATE quiz SET question = $1, answer = $2 WHERE id = $3',
       [question.question, question.answer, id]
     );
-    return result.affectedRows > 0;
+    return result.rowCount! > 0;
   }
 
   async delete(id: number): Promise<boolean> {
-    const [result] = await pool.execute<ResultSetHeader>(
-      'DELETE FROM quiz WHERE id = ?',
+    const result = await pool.query(
+      'DELETE FROM quiz WHERE id = $1',
       [id]
     );
-    return result.affectedRows > 0;
+    return result.rowCount! > 0;
   }
 
   async evaluateAnswers(answers: { questionId: number, answer: string }[]): Promise<QuizResult> {
@@ -53,14 +52,14 @@ class QuizModel {
     };
 
     for (const answer of answers) {
-      const [rows] = await pool.execute<RowDataPacket[]>(
-        'SELECT question, answer FROM quiz WHERE id = ?',
+      const queryResult = await pool.query(
+        'SELECT question, answer FROM quiz WHERE id = $1',
         [answer.questionId]
       );
       
-      if (rows.length === 0) continue;
+      if (queryResult.rows.length === 0) continue;
       
-      const correctAnswer = rows[0].answer;
+      const correctAnswer = queryResult.rows[0].answer;
       const isCorrect = answer.answer.toLowerCase().trim() === correctAnswer.toLowerCase().trim();
       
       if (isCorrect) {
@@ -69,7 +68,7 @@ class QuizModel {
       
       result.answers.push({
         questionId: answer.questionId,
-        question: rows[0].question,
+        question: queryResult.rows[0].question,
         userAnswer: answer.answer,
         correctAnswer: correctAnswer,
         isCorrect

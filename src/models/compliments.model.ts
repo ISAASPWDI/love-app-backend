@@ -1,67 +1,66 @@
 // src/models/compliments.model.ts
 import pool from '../config/db.config';
 import { Compliment } from '../types';
-import { ResultSetHeader, RowDataPacket } from 'mysql2';
 
 class ComplimentsModel {
   async create(compliment: Compliment): Promise<number> {
-    const [result] = await pool.execute<ResultSetHeader>(
-      'INSERT INTO compliments (content, is_favorite) VALUES (?, ?)',
+    const result = await pool.query(
+      'INSERT INTO compliments (content, is_favorite) VALUES ($1, $2) RETURNING id',
       [compliment.content, compliment.is_favorite || false]
     );
-    return result.insertId;
+    return result.rows[0].id;
   }
 
   async findAll(): Promise<Compliment[]> {
-    const [rows] = await pool.query<RowDataPacket[]>(
+    const result = await pool.query(
       'SELECT * FROM compliments ORDER BY created_at DESC'
     );
-    return rows as Compliment[];
+    return result.rows;
   }
 
   async findById(id: number): Promise<Compliment | null> {
-    const [rows] = await pool.execute<RowDataPacket[]>(
-      'SELECT * FROM compliments WHERE id = ?',
+    const result = await pool.query(
+      'SELECT * FROM compliments WHERE id = $1',
       [id]
     );
-    if (rows.length === 0) return null;
-    return rows[0] as Compliment;
+    if (result.rows.length === 0) return null;
+    return result.rows[0];
   }
 
   async update(id: number, compliment: Compliment): Promise<boolean> {
-    const [result] = await pool.execute<ResultSetHeader>(
-      'UPDATE compliments SET content = ?, is_favorite = ? WHERE id = ?',
+    const result = await pool.query(
+      'UPDATE compliments SET content = $1, is_favorite = $2 WHERE id = $3',
       [compliment.content, compliment.is_favorite || false, id]
     );
-    return result.affectedRows > 0;
+    return result.rowCount! > 0;
   }
 
   async toggleFavorite(id: number): Promise<boolean> {
     // First get current favorite status
-    const [rows] = await pool.execute<RowDataPacket[]>(
-      'SELECT is_favorite FROM compliments WHERE id = ?',
+    const selectResult = await pool.query(
+      'SELECT is_favorite FROM compliments WHERE id = $1',
       [id]
     );
     
-    if (rows.length === 0) return false;
+    if (selectResult.rows.length === 0) return false;
     
-    const currentStatus = rows[0].is_favorite;
+    const currentStatus = selectResult.rows[0].is_favorite;
     const newStatus = !currentStatus;
     
-    const [result] = await pool.execute<ResultSetHeader>(
-      'UPDATE compliments SET is_favorite = ? WHERE id = ?',
+    const updateResult = await pool.query(
+      'UPDATE compliments SET is_favorite = $1 WHERE id = $2',
       [newStatus, id]
     );
     
-    return result.affectedRows > 0;
+    return updateResult.rowCount! > 0;
   }
 
   async delete(id: number): Promise<boolean> {
-    const [result] = await pool.execute<ResultSetHeader>(
-      'DELETE FROM compliments WHERE id = ?',
+    const result = await pool.query(
+      'DELETE FROM compliments WHERE id = $1',
       [id]
     );
-    return result.affectedRows > 0;
+    return result.rowCount! > 0;
   }
 }
 
