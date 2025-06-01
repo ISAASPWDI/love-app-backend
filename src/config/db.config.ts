@@ -47,14 +47,15 @@ console.log('📊 Final DB Config:', {
 const pool = new Pool(dbConfig);
 
 // Manejo de eventos del pool con más detalles
-pool.on('connect', (client) => {
+pool.on('connect', () => {
   console.log('✅ Connected to PostgreSQL database');
   console.log('Connection info:', {
-    host: client.host,
-    port: client.port,
-    database: client.database
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    database: process.env.DB_NAME
   });
 });
+
 
 pool.on('acquire', () => {
   console.log('🔗 Client acquired from pool');
