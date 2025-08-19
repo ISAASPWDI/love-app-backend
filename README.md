@@ -1,9 +1,3 @@
-
----
-
-### README para el **backend** (`README.md`)
-
-```markdown
 # 💖 Love App - Backend
 
 API REST robusta que soporta la lógica compleja de Love App, incluyendo manejo de notas, recuerdos, cumplidos, línea de tiempo y quiz, construida con buenas prácticas y arquitectura limpia.
