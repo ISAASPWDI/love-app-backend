@@ -62,7 +62,7 @@ src/
 
 ## 🌐 Repositorio
 
-🔗 **GitHub:** [ISAASPWDI/sistema-de-biblioteca-UNCP](https://github.com/ISAASPWDI/love-app-backend)
+🔗 **GitHub:** [ISAASPWDI/love-app-backend](https://github.com/ISAASPWDI/love-app-backend)
 
 ---
 
